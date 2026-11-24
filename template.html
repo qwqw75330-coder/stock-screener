@@ -100,6 +100,9 @@
     <label>市值 ≥
       <select id="mc"><option value="0">不限</option><option value="20">20 億</option><option value="50" selected>50 億</option><option value="100">100 億</option><option value="300">300 億</option><option value="1000">1000 億</option></select>
     </label>
+    <label>成交量 ≥
+      <select id="vq"><option value="0">不限</option><option value="100">100 張</option><option value="500" selected>500 張</option><option value="1000">1,000 張</option><option value="5000">5,000 張</option></select>
+    </label>
     <label><input type="search" id="q" placeholder="搜尋代號或名稱"></label>
   </div>
 
@@ -147,9 +150,9 @@ const sign = v => v > 0 ? '▲' : v < 0 ? '▼' : '';
 function filtered() {
   const pe = +$('pe').value, mkt = $('mkt').value, dy = +$('dy').value || 0;
   const pb = $('pb').value === '' ? Infinity : +$('pb').value;
-  const mc = +$('mc').value;
+  const mc = +$('mc').value, vq = +$('vq').value;
   const q = $('q').value.trim().toLowerCase();
-  return valid.filter(r => r.pe < pe && (!mkt || r.m === mkt) && (r.dy ?? 0) >= dy && (r.pb ?? 0) <= pb && (!mc || (r.mc ?? 0) >= mc) &&
+  return valid.filter(r => r.pe < pe && (!mkt || r.m === mkt) && (r.dy ?? 0) >= dy && (r.pb ?? 0) <= pb && (!mc || (r.mc ?? 0) >= mc) && (!vq || (r.vol ?? 0) >= vq) &&
     (!q || r.c.toLowerCase().includes(q) || r.n.toLowerCase().includes(q)));
 }
 
@@ -196,7 +199,7 @@ document.querySelectorAll('thead th').forEach(th => th.onclick = () => {
   if (sortK === th.dataset.k) sortDir = -sortDir; else { sortK = th.dataset.k; sortDir = 1; }
   render();
 });
-['pe', 'mkt', 'dy', 'pb', 'mc', 'q'].forEach(id => $(id).addEventListener('input', render));
+['pe', 'mkt', 'dy', 'pb', 'mc', 'vq', 'q'].forEach(id => $(id).addEventListener('input', render));
 render();
 </script>
 </body>
