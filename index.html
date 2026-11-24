@@ -96,7 +96,9 @@
       <select id="mkt"><option value="">全部</option><option>上市</option><option>上櫃</option></select>
     </label>
     <label>殖利率 ≥ <input type="number" id="dy" min="0" step="0.5" value="0">%</label>
-    <label>股價淨值比 ≤ <input type="number" id="pb" min="0" step="0.1" placeholder="不限"></label>
+    <label>股價淨值比 ≤
+      <select id="pb"><option value="">不限</option><option value="0.8">0.8</option><option value="1">1</option><option value="1.5">1.5</option><option value="2">2</option><option value="3">3</option><option value="5">5</option></select>
+    </label>
     <label>市值 ≥
       <select id="mc"><option value="0">不限</option><option value="20">20 億</option><option value="50" selected>50 億</option><option value="100">100 億</option><option value="300">300 億</option><option value="1000">1000 億</option></select>
     </label>
