@@ -63,6 +63,28 @@
   .pebar i { display: block; height: 100%; background: var(--accent); }
   .empty { padding: 40px; text-align: center; color: var(--dim); }
   footer { color: var(--dim); font-size: 12px; padding: 14px 22px 28px; text-align: center; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tabs button { background: var(--panel); color: var(--dim); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+  .tabs button.on { color: #111; background: var(--accent); border-color: var(--accent); }
+  .killctl { display: none; border-color: #5a4300; }
+  body.kill .killctl { display: flex; }
+  .x { display: none; }
+  body.kill .x { display: table-cell; }
+  .hint { color: var(--dim); font-size: 12px; width: 100%; }
+  td.ind { color: var(--dim); font-size: 12px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+  td.news a { color: #6cb4ff; text-decoration: none; margin-left: 6px; font-size: 12px; }
+  td.news a:hover { text-decoration: underline; }
+  .abtn { background: #2a2210; color: var(--accent); border: 1px solid #5a4300; border-radius: 5px; padding: 2px 8px; font: inherit; font-size: 12px; cursor: pointer; }
+  .abtn.v-likely { background: #10261a; color: var(--down); border-color: #1d5c3a; }
+  .abtn.v-justified { background: #2a1214; color: var(--up); border-color: #6a2026; }
+  tr.arow td { text-align: left; white-space: normal; background: #0d131a; padding: 14px 18px 18px; border-left: 3px solid var(--accent); }
+  .ana { max-width: 900px; line-height: 1.7; }
+  .ana h4 { margin: 12px 0 4px; font-size: 13px; color: var(--accent); }
+  .ana h4:first-child { margin-top: 0; }
+  .ana ul { margin: 2px 0; padding-left: 20px; }
+  .ana .src a { color: #6cb4ff; }
+  .ana .meta { color: var(--dim); font-size: 12px; margin-top: 10px; }
   @media (max-width: 760px) {
     .stats { grid-template-columns: repeat(2, 1fr); }
     header { flex-wrap: wrap; gap: 4px; padding: 12px 16px; }
@@ -80,11 +102,29 @@
 <div class="ticker"><div class="ticker-inner" id="ticker"></div></div>
 
 <main>
+  <div class="tabs">
+    <button id="tabPe" class="on">本益比選股</button>
+    <button id="tabKill">錯殺候選</button>
+  </div>
+
   <div class="stats">
     <div class="stat"><div class="k">符合條件檔數</div><div class="v" id="sCount">–</div></div>
     <div class="stat"><div class="k">平均本益比</div><div class="v" id="sPe">–</div></div>
-    <div class="stat"><div class="k">平均殖利率</div><div class="v" id="sDy">–</div></div>
+    <div class="stat"><div class="k" id="s3k">平均殖利率</div><div class="v" id="sDy">–</div></div>
     <div class="stat"><div class="k">今日上漲 / 下跌</div><div class="v" id="sUd">–</div></div>
+  </div>
+
+  <div class="controls killctl">
+    <label>距 60 日高點跌幅 ≥
+      <select id="kdd"><option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option><option value="25">25%</option><option value="30">30%</option></select>
+    </label>
+    <label>比大盤多跌 ≥
+      <select id="krel"><option value="-999">不限</option><option value="0">0 個百分點</option><option value="5">5 個百分點</option><option value="10" selected>10 個百分點</option><option value="15">15 個百分點</option></select>
+    </label>
+    <label>營收月增 &gt;
+      <select id="kmom"><option value="-999">不限</option><option value="0" selected>0%</option><option value="10">10%</option><option value="20">20%</option></select>
+    </label>
+    <div class="hint" id="khint"></div>
   </div>
 
   <div class="controls">
@@ -94,6 +134,9 @@
     </label>
     <label>市場
       <select id="mkt"><option value="">全部</option><option>上市</option><option>上櫃</option></select>
+    </label>
+    <label>族群
+      <select id="ind"><option value="">全部</option></select>
     </label>
     <label>殖利率 ≥ <input type="number" id="dy" min="0" step="0.5" value="0">%</label>
     <label>股價淨值比 ≤
@@ -117,15 +160,18 @@
   <div class="tablewrap">
     <table>
       <thead><tr>
-        <th data-k="c">代號</th><th data-k="n">名稱</th><th data-k="m">市場</th>
-        <th data-k="px">收盤價</th><th data-k="ch">漲跌</th><th data-k="chp">漲跌幅</th>
+        <th data-k="c">代號</th><th data-k="n">名稱</th><th data-k="ind">族群</th>
+        <th data-k="px">收盤價</th><th data-k="chp">漲跌幅</th>
+        <th data-k="dd" class="x">距高點</th><th data-k="rel" class="x">比大盤</th>
+        <th data-k="mom" class="x">營收月增</th><th data-k="yoy" class="x">營收年增</th>
         <th data-k="pe">本益比</th><th data-k="dy">殖利率%</th><th data-k="pb">淨值比</th><th data-k="mc">市值(億)</th><th data-k="vol">成交量(張)</th>
+        <th data-k="">新聞</th><th data-k="" class="x">Claude 分析</th>
       </tr></thead>
       <tbody id="tb"></tbody>
     </table>
   </div>
 </main>
-<footer>資料來源：臺灣證券交易所、證券櫃檯買賣中心 OpenAPI。本益比為交易所公布之數值；虧損公司無本益比，不會出現在清單中。僅供參考，非投資建議。</footer>
+<footer>資料來源：臺灣證券交易所、證券櫃檯買賣中心 OpenAPI。本益比為交易所公布之數值；虧損公司無本益比，不會出現在清單中。<br>「錯殺候選」只是依股價跌幅與營收變化篩出的名單，下跌可能另有原因，請自行查看新聞與財報判斷。僅供參考，非投資建議。</footer>
 
 <script>/*__DATA__*/</script>
 <script>
@@ -136,11 +182,46 @@ const rows = D.rows.map(r => ({ ...r,
   vol: r.vol != null ? Math.round(r.vol / 1000) : null }));
 const valid = rows.filter(r => r.pe > 0);
 $('date').textContent = '資料日期 ' + D.date + '　·　共 ' + rows.length + ' 檔（有本益比 ' + valid.length + ' 檔）';
+$('khint').textContent = `距高點：現價比近 ${D.histDays || 60} 個交易日最高收盤跌了多少　·　比大盤：跌幅比同期加權指數多幾個百分點　·　營收月增：${D.revMonth || '最新'} 月營收比上月　·　注意：月增會受季節（如農曆年、工作天數）影響`;
 
-let sortK = 'pe', sortDir = 1;
+[...new Set(valid.map(r => r.ind).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh-Hant'))
+  .forEach(n => $('ind').insertAdjacentHTML('beforeend', `<option>${n}</option>`));
+
+let kill = false, sortK = 'pe', sortDir = 1;
+
+// ---------- Claude 每日分析（雲端排程產生 analysis.json） ----------
+let ANA = null;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const VERDICT = { likely: '可能錯殺', justified: '下跌有理', unclear: '資訊不足' };
+fetch('analysis.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { ANA = j; render(); }).catch(() => {});
+function anaBtn(r) {
+  const a = ANA && ANA.stocks && ANA.stocks[r.c];
+  if (!a) return '<span class="code">–</span>';
+  return `<button class="abtn v-${esc(a.verdict)}" data-c="${r.c}">${VERDICT[a.verdict] || '看分析'} ▾</button>`;
+}
+function anaHtml(c) {
+  const a = ANA.stocks[c];
+  const list = xs => xs && xs.length ? '<ul>' + xs.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : '<p>–</p>';
+  return `<div class="ana">
+    <h4>判斷：${esc(VERDICT[a.verdict] || a.verdict)}</h4><p>${esc(a.summary)}</p>
+    <h4>下跌可能原因</h4>${list(a.reasons)}
+    <h4>底層邏輯</h4><p>${esc(a.logic)}</p>
+    <h4>營收數字是否支持</h4><p>${esc(a.revenueCheck)}</p>
+    <h4>待確認的風險</h4>${list(a.risks)}
+    <h4>參考來源（請自行核對）</h4><ul class="src">${(a.sources || []).map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a> <span class="code">${esc(s.publisher || '')} ${esc(s.date || '')}</span></li>`).join('')}</ul>
+    <div class="meta">Claude 分析於 ${esc(ANA.generatedAt)}（資料日 ${esc(ANA.dataDate)}）。推論可能有誤，請以原始新聞與公司公告為準，非投資建議。</div>
+  </div>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.abtn'); if (!b) return;
+  const tr = b.closest('tr'), next = tr.nextElementSibling;
+  if (next && next.classList.contains('arow')) { next.remove(); return; }
+  tr.insertAdjacentHTML('afterend', `<tr class="arow"><td colspan="16">${anaHtml(b.dataset.c)}</td></tr>`);
+});
 const fmt = (v, d = 2) => v == null ? '–' : v.toLocaleString('zh-TW', { minimumFractionDigits: d, maximumFractionDigits: d });
 const cls = v => v > 0 ? 'up' : v < 0 ? 'down' : '';
 const sign = v => v > 0 ? '▲' : v < 0 ? '▼' : '';
+const pct = v => v == null ? '–' : (v > 0 ? '+' : '') + fmt(v, 1) + '%';
 
 // 跑馬燈：成交量前 30 大
 (function () {
@@ -150,11 +231,14 @@ const sign = v => v > 0 ? '▲' : v < 0 ? '▼' : '';
 })();
 
 function filtered() {
-  const pe = +$('pe').value, mkt = $('mkt').value, dy = +$('dy').value || 0;
+  const pe = +$('pe').value, mkt = $('mkt').value, ind = $('ind').value, dy = +$('dy').value || 0;
   const pb = $('pb').value === '' ? Infinity : +$('pb').value;
   const mc = +$('mc').value, vq = +$('vq').value;
+  const kdd = +$('kdd').value, krel = +$('krel').value, kmom = +$('kmom').value;
   const q = $('q').value.trim().toLowerCase();
-  return valid.filter(r => r.pe < pe && (!mkt || r.m === mkt) && (r.dy ?? 0) >= dy && (r.pb ?? 0) <= pb && (!mc || (r.mc ?? 0) >= mc) && (!vq || (r.vol ?? 0) >= vq) &&
+  return valid.filter(r => r.pe < pe && (!mkt || r.m === mkt) && (!ind || r.ind === ind) && (r.dy ?? 0) >= dy && (r.pb ?? 0) <= pb &&
+    (!mc || (r.mc ?? 0) >= mc) && (!vq || (r.vol ?? 0) >= vq) &&
+    (!kill || (r.dd != null && r.dd <= -kdd && (krel <= -999 || (r.rel != null && r.rel <= -krel)) && (kmom <= -999 || (r.mom != null && r.mom > kmom)))) &&
     (!q || r.c.toLowerCase().includes(q) || r.n.toLowerCase().includes(q)));
 }
 
@@ -166,6 +250,12 @@ function drawHist(pe) {
     const lo = i * 2, label = i === 29 ? '58+' : `${lo}–${lo + 2}`;
     return `<div class="bar ${lo < pe ? 'on' : ''}" style="height:${Math.max(2, n / max * 100)}%" data-tip="本益比 ${label}：${n} 檔"></div>`;
   }).join('');
+}
+
+function newsLinks(r) {
+  const g = 'https://news.google.com/search?q=' + encodeURIComponent(`${r.n} ${r.c} when:14d`) + '&hl=zh-TW&gl=TW&ceid=TW:zh-Hant';
+  const y = `https://tw.stock.yahoo.com/quote/${r.c}.${r.m === '上市' ? 'TW' : 'TWO'}/news`;
+  return `<a href="${g}" target="_blank" rel="noopener">Google</a><a href="${y}" target="_blank" rel="noopener">Yahoo</a>`;
 }
 
 function render() {
@@ -180,29 +270,44 @@ function render() {
   const avg = k => { const v = list.filter(r => r[k] != null); return v.length ? v.reduce((s, r) => s + r[k], 0) / v.length : null; };
   $('sCount').textContent = list.length;
   $('sPe').textContent = fmt(avg('pe'));
-  $('sDy').textContent = list.length ? fmt(avg('dy')) + '%' : '–';
+  $('s3k').textContent = kill ? '平均距高點跌幅' : '平均殖利率';
+  $('sDy').textContent = !list.length ? '–' : kill ? fmt(avg('dd'), 1) + '%' : fmt(avg('dy')) + '%';
   $('sUd').innerHTML = `<span class="up">${list.filter(r => r.ch > 0).length}</span> / <span class="down">${list.filter(r => r.ch < 0).length}</span>`;
   document.querySelectorAll('thead th').forEach(th => {
-    th.classList.toggle('sorted', th.dataset.k === sortK);
-    th.textContent = th.textContent.replace(/ [▲▼]$/, '') + (th.dataset.k === sortK ? (sortDir > 0 ? ' ▲' : ' ▼') : '');
+    th.classList.toggle('sorted', !!th.dataset.k && th.dataset.k === sortK);
+    th.textContent = th.textContent.replace(/ [▲▼]$/, '') + (th.dataset.k && th.dataset.k === sortK ? (sortDir > 0 ? ' ▲' : ' ▼') : '');
   });
-  if (!list.length) { $('tb').innerHTML = '<tr><td colspan="11" class="empty">沒有符合條件的股票</td></tr>'; return; }
+  if (!list.length) { $('tb').innerHTML = '<tr><td colspan="16" class="empty">沒有符合條件的股票</td></tr>'; return; }
   $('tb').innerHTML = list.map(r => `<tr>
-    <td class="code">${r.c}</td><td class="name">${r.n}</td><td><span class="tag">${r.m}</span></td>
+    <td class="code">${r.c}</td><td class="name">${r.n}</td><td class="ind" title="${r.ind || ''}">${r.ind || '–'}</td>
     <td class="${cls(r.ch)}">${fmt(r.px)}</td>
-    <td class="${cls(r.ch)}">${sign(r.ch)} ${fmt(r.ch == null ? null : Math.abs(r.ch))}</td>
-    <td class="${cls(r.ch)}">${r.chp == null ? '–' : fmt(r.chp) + '%'}</td>
+    <td class="${cls(r.ch)}">${r.chp == null ? '–' : sign(r.ch) + ' ' + fmt(Math.abs(r.chp)) + '%'}</td>
+    <td class="x ${cls(r.dd)}">${pct(r.dd)}${r.hd ? ` <span class="code">(${r.hd}高)</span>` : ''}</td>
+    <td class="x ${cls(r.rel)}">${r.rel == null ? '–' : (r.rel > 0 ? '+' : '') + fmt(r.rel, 1)}</td>
+    <td class="x ${cls(r.mom)}">${pct(r.mom)}</td><td class="x ${cls(r.yoy)}">${pct(r.yoy)}</td>
     <td><div class="pecell"><div class="pebar"><i style="width:${Math.min(100, r.pe / pe * 100)}%"></i></div>${fmt(r.pe)}</div></td>
-    <td>${fmt(r.dy)}</td><td>${fmt(r.pb)}</td><td>${r.mc == null ? "–" : fmt(r.mc, 0)}</td><td>${r.vol == null ? '–' : r.vol.toLocaleString()}</td>
+    <td>${fmt(r.dy)}</td><td>${fmt(r.pb)}</td><td>${r.mc == null ? '–' : fmt(r.mc, 0)}</td><td>${r.vol == null ? '–' : r.vol.toLocaleString()}</td>
+    <td class="news">${newsLinks(r)}</td>
+    <td class="x">${anaBtn(r)}</td>
   </tr>`).join('');
 }
 
+function setTab(k) {
+  kill = k;
+  document.body.classList.toggle('kill', kill);
+  $('tabPe').classList.toggle('on', !kill); $('tabKill').classList.toggle('on', kill);
+  sortK = kill ? 'dd' : 'pe'; sortDir = 1;
+  render();
+}
+$('tabPe').onclick = () => setTab(false);
+$('tabKill').onclick = () => setTab(true);
 document.querySelectorAll('thead th').forEach(th => th.onclick = () => {
+  if (!th.dataset.k) return;
   if (sortK === th.dataset.k) sortDir = -sortDir; else { sortK = th.dataset.k; sortDir = 1; }
   render();
 });
-['pe', 'mkt', 'dy', 'pb', 'mc', 'vq', 'q'].forEach(id => $(id).addEventListener('input', render));
-render();
+['pe', 'mkt', 'ind', 'dy', 'pb', 'mc', 'vq', 'kdd', 'krel', 'kmom', 'q'].forEach(id => $(id).addEventListener('input', render));
+if (location.hash === '#kill') setTab(true); else render();
 </script>
 </body>
 </html>
