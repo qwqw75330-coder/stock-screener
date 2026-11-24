@@ -47,8 +47,8 @@
                            "revenueMoMPct":  4.6,
                            "revenueYoYPct":  47.9,
                            "revenueYtdYoYPct":  36.8,
-                           "pe":  17.32,
-                           "pb":  3.13,
+                           "pe":  15.76,
+                           "pb":  2.85,
                            "marketCap100M":  762.2
                        },
                        {
@@ -127,9 +127,25 @@
                            "revenueMoMPct":  6.1,
                            "revenueYoYPct":  71,
                            "revenueYtdYoYPct":  30,
-                           "pe":  14.97,
-                           "pb":  1.62,
+                           "pe":  13.61,
+                           "pb":  1.47,
                            "marketCap100M":  71.2
+                       },
+                       {
+                           "code":  "3691",
+                           "name":  "碩禾",
+                           "market":  "上櫃",
+                           "industry":  "光電業",
+                           "close":  91.8,
+                           "drawdownPct":  -38.2,
+                           "highDate":  "11/09",
+                           "vsMarketPct":  -34.5,
+                           "revenueMoMPct":  6.9,
+                           "revenueYoYPct":  59.2,
+                           "revenueYtdYoYPct":  105.5,
+                           "pe":  19.42,
+                           "pb":  1.26,
+                           "marketCap100M":  84.3
                        },
                        {
                            "code":  "1718",
@@ -159,8 +175,8 @@
                            "revenueMoMPct":  3.9,
                            "revenueYoYPct":  195.3,
                            "revenueYtdYoYPct":  50.5,
-                           "pe":  19.11,
-                           "pb":  3.63,
+                           "pe":  17.37,
+                           "pb":  3.3,
                            "marketCap100M":  64.7
                        },
                        {
@@ -175,8 +191,8 @@
                            "revenueMoMPct":  4.9,
                            "revenueYoYPct":  -10.8,
                            "revenueYtdYoYPct":  -11.3,
-                           "pe":  19.17,
-                           "pb":  0.98,
+                           "pe":  17.44,
+                           "pb":  0.89,
                            "marketCap100M":  124.8
                        },
                        {
@@ -191,9 +207,25 @@
                            "revenueMoMPct":  8.5,
                            "revenueYoYPct":  282.3,
                            "revenueYtdYoYPct":  222.7,
-                           "pe":  2.49,
-                           "pb":  1.84,
+                           "pe":  2.29,
+                           "pb":  1.69,
                            "marketCap100M":  966
+                       },
+                       {
+                           "code":  "5425",
+                           "name":  "台半",
+                           "market":  "上櫃",
+                           "industry":  "半導體業",
+                           "close":  69,
+                           "drawdownPct":  -34.6,
+                           "highDate":  "10/05",
+                           "vsMarketPct":  -15.3,
+                           "revenueMoMPct":  6.4,
+                           "revenueYoYPct":  34.4,
+                           "revenueYtdYoYPct":  10.9,
+                           "pe":  19.56,
+                           "pb":  1.9,
+                           "marketCap100M":  181.8
                        },
                        {
                            "code":  "2392",
@@ -223,8 +255,8 @@
                            "revenueMoMPct":  13.3,
                            "revenueYoYPct":  54,
                            "revenueYtdYoYPct":  28.1,
-                           "pe":  13.84,
-                           "pb":  1.62,
+                           "pe":  12.59,
+                           "pb":  1.47,
                            "marketCap100M":  50.9
                        },
                        {
@@ -255,8 +287,8 @@
                            "revenueMoMPct":  0.7,
                            "revenueYoYPct":  6,
                            "revenueYtdYoYPct":  1.1,
-                           "pe":  14.58,
-                           "pb":  2.8,
+                           "pe":  13.31,
+                           "pb":  2.56,
                            "marketCap100M":  62.7
                        },
                        {
@@ -319,8 +351,8 @@
                            "revenueMoMPct":  11.6,
                            "revenueYoYPct":  29,
                            "revenueYtdYoYPct":  41.8,
-                           "pe":  7.6,
-                           "pb":  1.69,
+                           "pe":  7.3,
+                           "pb":  1.62,
                            "marketCap100M":  68.1
                        },
                        {
@@ -399,8 +431,8 @@
                            "revenueMoMPct":  0.5,
                            "revenueYoYPct":  417.3,
                            "revenueYtdYoYPct":  479,
-                           "pe":  5.94,
-                           "pb":  2.89,
+                           "pe":  5.4,
+                           "pb":  2.63,
                            "marketCap100M":  282.3
                        },
                        {
@@ -431,8 +463,8 @@
                            "revenueMoMPct":  4.9,
                            "revenueYoYPct":  60.5,
                            "revenueYtdYoYPct":  35.9,
-                           "pe":  15.37,
-                           "pb":  2.82,
+                           "pe":  13.98,
+                           "pb":  2.57,
                            "marketCap100M":  53.5
                        },
                        {
@@ -463,8 +495,8 @@
                            "revenueMoMPct":  4.7,
                            "revenueYoYPct":  138.8,
                            "revenueYtdYoYPct":  62.6,
-                           "pe":  4.13,
-                           "pb":  1.2,
+                           "pe":  3.83,
+                           "pb":  1.11,
                            "marketCap100M":  74.8
                        },
                        {
