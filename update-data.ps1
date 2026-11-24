@@ -53,3 +53,18 @@ $tpl = [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'template.html'), [Text.E
 $out = Join-Path $PSScriptRoot 'index.html'
 [IO.File]::WriteAllText($out, $tpl.Replace('/*__DATA__*/', "window.STOCK_DATA = $json;"), (New-Object Text.UTF8Encoding $false))
 Write-Host "完成：$($rows.Count) 檔，資料日期 $date -> $out"
+
+# 推送到 GitHub Pages（資料有變才 commit）
+$git = 'C:\Program Files\Git\cmd\git.exe'
+Set-Location $PSScriptRoot
+$ErrorActionPreference = 'Continue'   # git 會把進度訊息寫到 stderr，不能當成錯誤
+& $git add index.html template.html update-data.ps1
+& $git diff --cached --quiet
+if ($LASTEXITCODE -ne 0) {
+    & $git commit -q -m "Update data $date"
+    & $git push -q origin main
+    if ($LASTEXITCODE -eq 0) { Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm') 已推送到 GitHub ($date)" }
+    else { Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm') 推送失敗" }
+} else {
+    Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm') 資料沒有變化，不需推送"
+}
