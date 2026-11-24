@@ -118,13 +118,22 @@ function Get-TradingDay([datetime]$d) {
     $key = $d.ToString('yyyyMMdd')
     $tw = Get-Json "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=$key&type=ALLBUT0999&response=json"
     if ($tw.stat -ne 'OK' -or -not $tw.tables) { return $null }
-    $p = @{}; $idx = $null
+    $p = @{}; $vol = @{}; $chg = @{}; $idx = $null
     foreach ($tb in $tw.tables) {
         if (-not $tb.fields) { continue }
         $f = @($tb.fields)
         $ci = [array]::IndexOf($f, '收盤價')
         if ($f[0] -eq '證券代號' -and $ci -ge 0) {
-            foreach ($row in $tb.data) { $v = To-Num $row[$ci]; if ($v) { $p["$($row[0])"] = $v } }
+            $vi = [array]::IndexOf($f, '成交股數'); $si = [array]::IndexOf($f, '漲跌(+/-)'); $di = [array]::IndexOf($f, '漲跌價差')
+            foreach ($row in $tb.data) {
+                $code = "$($row[0])"; $v = To-Num $row[$ci]
+                if ($v) {
+                    $p[$code] = $v
+                    $vol[$code] = To-Num $row[$vi]
+                    $diff = To-Num $row[$di]; if (-not $diff) { $diff = 0 }
+                    $chg[$code] = if ("$($row[$si])" -match '-') { -$diff } else { $diff }
+                }
+            }
         }
         if ($f[0] -eq '指數' -and -not $idx) {
             foreach ($row in $tb.data) { if ($row[0] -eq '發行量加權股價指數') { $idx = To-Num $row[1] } }
@@ -134,35 +143,67 @@ function Get-TradingDay([datetime]$d) {
     $ot = Get-Json ("https://www.tpex.org.tw/www/zh-tw/afterTrading/otc?date=" + [uri]::EscapeDataString($d.ToString('yyyy/MM/dd')) + "&type=EW&response=json")
     foreach ($tb in $ot.tables) {
         if (-not $tb.data) { continue }
-        foreach ($row in $tb.data) { $v = To-Num $row[2]; if ($v) { $p["$($row[0])"] = $v } }
+        foreach ($row in $tb.data) {
+            $code = "$($row[0])"; $v = To-Num $row[2]
+            if ($v) { $p[$code] = $v; $vol[$code] = To-Num $row[7]; $c = To-Num $row[3]; $chg[$code] = if ($c) { $c } else { 0 } }
+        }
     }
     if ($p.Count -lt 500) { return $null }
-    return @{ i = $idx; p = $p }
+    return @{ i = $idx; p = $p; v = $vol; c = $chg }
 }
 
+# 從今天往回抓：盤後行情約 15:00 就有當天資料（OpenAPI 要到隔天才更新）
 $need = 61
-$latest = [datetime]::ParseExact($date, 'yyyy-MM-dd', $null)
-$d = $latest; $have = 0; $fetched = 0
-while ($have -lt $need -and $d -gt $latest.AddDays(-140)) {
+$today = (Get-Date).Date
+$latest = $today
+$d = $today; $have = 0; $fetched = 0
+while ($have -lt $need -and $d -gt $today.AddDays(-150)) {
     $key = $d.ToString('yyyyMMdd')
     if ($d.DayOfWeek -eq 'Saturday' -or $d.DayOfWeek -eq 'Sunday' -or $closed[$key]) { $d = $d.AddDays(-1); continue }
     if (-not $days[$key]) {
         Write-Host "  抓取 $key 歷史股價..."
-        $day = $null
-        try { $day = Get-TradingDay $d } catch { Write-Host "  $key 抓取失敗：$_" }
+        $day = $null; $failed = $false
+        try { $day = Get-TradingDay $d } catch { $failed = $true; Write-Host "  $key 抓取失敗：$_" }
         $fetched++
         Start-Sleep -Seconds 3   # 證交所有頻率限制
-        if ($day) { $days[$key] = $day } elseif ($d -lt $latest) { $closed[$key] = $true }
+        if ($day) { $days[$key] = $day } elseif (-not $failed -and $d -lt $today) { $closed[$key] = $true }
     }
     if ($days[$key]) { $have++ }
     $d = $d.AddDays(-1)
 }
 $keys = @($days.Keys | Sort-Object -Descending | Select-Object -First $need)
-$keep = @{}; foreach ($k in $keys) { $keep[$k] = $days[$k] }
+$keep = @{}; $save = @{}
+foreach ($k in $keys) { $keep[$k] = $days[$k]; $save[$k] = @{ i = $days[$k].i; p = $days[$k].p } }
 $oldest = ($keys | Sort-Object)[0]
 $closedKeep = @($closed.Keys | Where-Object { $_ -ge $oldest })
-[IO.File]::WriteAllText($histFile, (@{ days = $keep; closed = $closedKeep } | ConvertTo-Json -Depth 5 -Compress), (New-Object Text.UTF8Encoding $false))
+[IO.File]::WriteAllText($histFile, (@{ days = $save; closed = $closedKeep } | ConvertTo-Json -Depth 5 -Compress), (New-Object Text.UTF8Encoding $false))
 Write-Host "歷史股價：$($keys.Count) 個交易日（本次新抓 $fetched 天）"
+
+# 盤後行情比 OpenAPI 新：用最新一天的收盤價更新，本益比／淨值比／殖利率依股價變化換算
+# （每股盈餘、每股淨值、股利在兩次財報之間不變，換算結果與交易所公布值一致）
+$newest = $keys[0]
+$apiKey = $date.Replace('-', '')
+if ($newest -gt $apiKey) {
+    $nd = $keep[$newest]
+    if (-not $nd.v) { $nd = Get-TradingDay ([datetime]::ParseExact($newest, 'yyyyMMdd', $null)); $keep[$newest] = $nd }
+    $n = 0
+    foreach ($r in $rows) {
+        $new = $nd.p[$r.c]
+        if (-not $new) { continue }
+        $old = $r.px
+        if ($old -and $old -gt 0) {
+            $f = $new / $old
+            if ($r.pe) { $r.pe = [math]::Round($r.pe * $f, 2) }
+            if ($r.pb) { $r.pb = [math]::Round($r.pb * $f, 2) }
+            if ($r.dy) { $r.dy = [math]::Round($r.dy / $f, 2) }
+        }
+        $r.px = $new; $r.ch = $nd.c[$r.c]; $r.vol = $nd.v[$r.c]
+        $r.mc = Get-MarketCap $r.c $r.px
+        $n++
+    }
+    $date = '{0}-{1}-{2}' -f $newest.Substring(0, 4), $newest.Substring(4, 2), $newest.Substring(6, 2)
+    Write-Host "已用 $date 盤後行情更新 $n 檔（本益比依股價換算）"
+}
 
 # 距近 60 日最高收盤的跌幅，以及同期大盤漲跌
 $asc = @($keys | Sort-Object)
