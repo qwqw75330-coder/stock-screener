@@ -19,6 +19,31 @@ Write-Host '抓取上櫃資料...'
 $otPe  = Get-Json 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis'
 $otDay = Get-Json 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes'
 
+Write-Host '抓取公司基本資料（股本）...'
+$twInfo = Get-Json 'https://openapi.twse.com.tw/v1/opendata/t187ap03_L'
+$otInfo = Get-Json 'https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O'
+
+# 普通股股數 = (實收資本額 - 特別股股數 x 面額) / 面額
+function Get-Shares($capital, $preferred, $parText) {
+    $cap = To-Num $capital; if (-not $cap) { return $null }
+    $par = 10.0
+    $m = [regex]::Match("$parText", '[\d.]+')
+    if ($m.Success -and [double]$m.Value -gt 0) { $par = [double]$m.Value }
+    $pref = To-Num $preferred; if (-not $pref) { $pref = 0 }
+    $s = ($cap - $pref * $par) / $par
+    if ($s -gt 0) { return $s } else { return $cap / $par }
+}
+$shares = @{}
+foreach ($i in $twInfo) { $shares[$i.'公司代號'] = Get-Shares $i.'實收資本額' $i.'特別股' $i.'普通股每股面額' }
+foreach ($i in $otInfo) { $shares[$i.SecuritiesCompanyCode] = Get-Shares $i.'Paidin.Capital.NTDollars' $i.'PreferredStock.shares' $i.ParValueOfCommonStock }
+
+# 市值（億元）
+function Get-MarketCap($code, $price) {
+    $s = $shares[$code]
+    if ($s -and $price) { return [math]::Round($s * $price / 1e8, 1) }
+    return $null
+}
+
 $twPx = @{}; foreach ($d in $twDay) { $twPx[$d.Code] = $d }
 $otPx = @{}; foreach ($d in $otDay) { $otPx[$d.SecuritiesCompanyCode] = $d }
 
@@ -43,6 +68,7 @@ foreach ($p in $otPe) {
         vol = if ($q) { To-Num $q.TradingShares } else { $null }
     })
 }
+foreach ($r in $rows) { $r.mc = Get-MarketCap $r.c $r.px }
 
 # 民國日期 (例 1151123) 轉西元
 $raw = "$($twPe[0].Date)"

@@ -91,6 +91,9 @@
     </label>
     <label>殖利率 ≥ <input type="number" id="dy" min="0" step="0.5" value="0">%</label>
     <label>股價淨值比 ≤ <input type="number" id="pb" min="0" step="0.1" placeholder="不限"></label>
+    <label>市值 ≥
+      <select id="mc"><option value="0">不限</option><option value="20">20 億</option><option value="50" selected>50 億</option><option value="100">100 億</option><option value="300">300 億</option><option value="1000">1000 億</option></select>
+    </label>
     <label><input type="search" id="q" placeholder="搜尋代號或名稱"></label>
   </div>
 
@@ -105,7 +108,7 @@
       <thead><tr>
         <th data-k="c">代號</th><th data-k="n">名稱</th><th data-k="m">市場</th>
         <th data-k="px">收盤價</th><th data-k="ch">漲跌</th><th data-k="chp">漲跌幅</th>
-        <th data-k="pe">本益比</th><th data-k="dy">殖利率%</th><th data-k="pb">淨值比</th><th data-k="vol">成交量(張)</th>
+        <th data-k="pe">本益比</th><th data-k="dy">殖利率%</th><th data-k="pb">淨值比</th><th data-k="mc">市值(億)</th><th data-k="vol">成交量(張)</th>
       </tr></thead>
       <tbody id="tb"></tbody>
     </table>
@@ -138,8 +141,9 @@ const sign = v => v > 0 ? '▲' : v < 0 ? '▼' : '';
 function filtered() {
   const pe = +$('pe').value, mkt = $('mkt').value, dy = +$('dy').value || 0;
   const pb = $('pb').value === '' ? Infinity : +$('pb').value;
+  const mc = +$('mc').value;
   const q = $('q').value.trim().toLowerCase();
-  return valid.filter(r => r.pe < pe && (!mkt || r.m === mkt) && (r.dy ?? 0) >= dy && (r.pb ?? 0) <= pb &&
+  return valid.filter(r => r.pe < pe && (!mkt || r.m === mkt) && (r.dy ?? 0) >= dy && (r.pb ?? 0) <= pb && (!mc || (r.mc ?? 0) >= mc) &&
     (!q || r.c.toLowerCase().includes(q) || r.n.toLowerCase().includes(q)));
 }
 
@@ -171,14 +175,14 @@ function render() {
     th.classList.toggle('sorted', th.dataset.k === sortK);
     th.textContent = th.textContent.replace(/ [▲▼]$/, '') + (th.dataset.k === sortK ? (sortDir > 0 ? ' ▲' : ' ▼') : '');
   });
-  if (!list.length) { $('tb').innerHTML = '<tr><td colspan="10" class="empty">沒有符合條件的股票</td></tr>'; return; }
+  if (!list.length) { $('tb').innerHTML = '<tr><td colspan="11" class="empty">沒有符合條件的股票</td></tr>'; return; }
   $('tb').innerHTML = list.map(r => `<tr>
     <td class="code">${r.c}</td><td class="name">${r.n}</td><td><span class="tag">${r.m}</span></td>
     <td class="${cls(r.ch)}">${fmt(r.px)}</td>
     <td class="${cls(r.ch)}">${sign(r.ch)} ${fmt(r.ch == null ? null : Math.abs(r.ch))}</td>
     <td class="${cls(r.ch)}">${r.chp == null ? '–' : fmt(r.chp) + '%'}</td>
     <td><div class="pecell"><div class="pebar"><i style="width:${Math.min(100, r.pe / pe * 100)}%"></i></div>${fmt(r.pe)}</div></td>
-    <td>${fmt(r.dy)}</td><td>${fmt(r.pb)}</td><td>${r.vol == null ? '–' : r.vol.toLocaleString()}</td>
+    <td>${fmt(r.dy)}</td><td>${fmt(r.pb)}</td><td>${r.mc == null ? "–" : fmt(r.mc, 0)}</td><td>${r.vol == null ? '–' : r.vol.toLocaleString()}</td>
   </tr>`).join('');
 }
 
@@ -186,7 +190,7 @@ document.querySelectorAll('thead th').forEach(th => th.onclick = () => {
   if (sortK === th.dataset.k) sortDir = -sortDir; else { sortK = th.dataset.k; sortDir = 1; }
   render();
 });
-['pe', 'mkt', 'dy', 'pb', 'q'].forEach(id => $(id).addEventListener('input', render));
+['pe', 'mkt', 'dy', 'pb', 'mc', 'q'].forEach(id => $(id).addEventListener('input', render));
 render();
 </script>
 </body>
