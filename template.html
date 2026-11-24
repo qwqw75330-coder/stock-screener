@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>台股本益比選股</title>
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #121821; --line: #1f2a36; --text: #d7dee7; --dim: #7d8a99;
+    --up: #ff4d4f; --down: #26c281; --accent: #f5b301; --row: #0f151d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.45 "Segoe UI", "Microsoft JhengHei", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 14px 22px;
+    border-bottom: 1px solid var(--line); background: var(--panel); }
+  header h1 { margin: 0; font-size: 18px; letter-spacing: .5px; }
+  header h1 span { color: var(--accent); }
+  .date { margin-left: auto; color: var(--dim); font-size: 13px; }
+  .ticker { overflow: hidden; white-space: nowrap; border-bottom: 1px solid var(--line);
+    background: #0d131a; font-variant-numeric: tabular-nums; font-size: 13px; }
+  .ticker-inner { display: inline-block; padding: 7px 0; animation: scroll 120s linear infinite; }
+  .ticker-inner b { margin: 0 6px 0 22px; font-weight: 600; }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  main { padding: 18px 22px; max-width: 1400px; margin: 0 auto; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .stat .k { color: var(--dim); font-size: 12px; }
+  .stat .v { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
+  .controls label { color: var(--dim); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  input[type=range] { accent-color: var(--accent); width: 180px; }
+  .pe-val { color: var(--accent); font-weight: 700; font-size: 16px; min-width: 52px; font-variant-numeric: tabular-nums; }
+  input[type=search], input[type=number], select { background: var(--bg); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font: inherit; }
+  input[type=search] { width: 190px; }
+  input[type=number] { width: 72px; }
+  .hist { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px 8px; margin-bottom: 16px; }
+  .hist h3 { margin: 0 0 8px; font-size: 13px; color: var(--dim); font-weight: 500; }
+  .bars { display: flex; align-items: flex-end; gap: 3px; height: 90px; }
+  .bar { flex: 1; background: #2a3644; border-radius: 2px 2px 0 0; position: relative; cursor: default; }
+  .bar.on { background: var(--accent); }
+  .bar:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: #000; color: #fff; font-size: 11px; padding: 3px 6px; border-radius: 4px; white-space: nowrap; margin-bottom: 4px; z-index: 2; }
+  .axis { display: flex; justify-content: space-between; color: var(--dim); font-size: 11px; margin-top: 4px; }
+  .tablewrap { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: auto; max-height: 70vh; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { padding: 8px 12px; text-align: right; white-space: nowrap; }
+  th:nth-child(-n+3), td:nth-child(-n+3) { text-align: left; }
+  thead th { position: sticky; top: 0; background: #17202b; color: var(--dim); font-weight: 500; font-size: 12px;
+    cursor: pointer; user-select: none; border-bottom: 1px solid var(--line); }
+  thead th:hover { color: var(--text); }
+  thead th.sorted { color: var(--accent); }
+  tbody tr:nth-child(even) { background: var(--row); }
+  tbody tr:hover { background: #1a2532; }
+  td.code { color: var(--dim); }
+  td.name { font-weight: 600; }
+  .tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--dim); }
+  .up { color: var(--up); } .down { color: var(--down); }
+  .pecell { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+  .pebar { width: 60px; height: 6px; background: #223; border-radius: 3px; overflow: hidden; }
+  .pebar i { display: block; height: 100%; background: var(--accent); }
+  .empty { padding: 40px; text-align: center; color: var(--dim); }
+  footer { color: var(--dim); font-size: 12px; padding: 14px 22px 28px; text-align: center; }
+  @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>台股 <span>本益比</span> 選股器</h1>
+  <div class="date" id="date"></div>
+</header>
+<div class="ticker"><div class="ticker-inner" id="ticker"></div></div>
+
+<main>
+  <div class="stats">
+    <div class="stat"><div class="k">符合條件檔數</div><div class="v" id="sCount">–</div></div>
+    <div class="stat"><div class="k">平均本益比</div><div class="v" id="sPe">–</div></div>
+    <div class="stat"><div class="k">平均殖利率</div><div class="v" id="sDy">–</div></div>
+    <div class="stat"><div class="k">今日上漲 / 下跌</div><div class="v" id="sUd">–</div></div>
+  </div>
+
+  <div class="controls">
+    <label>本益比 &lt;
+      <input type="range" id="pe" min="1" max="60" step="0.5" value="20">
+      <span class="pe-val" id="peVal">20</span>
+    </label>
+    <label>市場
+      <select id="mkt"><option value="">全部</option><option>上市</option><option>上櫃</option></select>
+    </label>
+    <label>殖利率 ≥ <input type="number" id="dy" min="0" step="0.5" value="0">%</label>
+    <label>股價淨值比 ≤ <input type="number" id="pb" min="0" step="0.1" placeholder="不限"></label>
+    <label><input type="search" id="q" placeholder="搜尋代號或名稱"></label>
+  </div>
+
+  <div class="hist">
+    <h3>全市場本益比分布（黃色 = 目前篩選範圍；無獲利／虧損公司不列入）</h3>
+    <div class="bars" id="bars"></div>
+    <div class="axis"><span>0</span><span>15</span><span>30</span><span>45</span><span>60+</span></div>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr>
+        <th data-k="c">代號</th><th data-k="n">名稱</th><th data-k="m">市場</th>
+        <th data-k="px">收盤價</th><th data-k="ch">漲跌</th><th data-k="chp">漲跌幅</th>
+        <th data-k="pe">本益比</th><th data-k="dy">殖利率%</th><th data-k="pb">淨值比</th><th data-k="vol">成交量(張)</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+</main>
+<footer>資料來源：臺灣證券交易所、證券櫃檯買賣中心 OpenAPI。本益比為交易所公布之數值；虧損公司無本益比，不會出現在清單中。僅供參考，非投資建議。</footer>
+
+<script>/*__DATA__*/</script>
+<script>
+const D = window.STOCK_DATA;
+const $ = id => document.getElementById(id);
+const rows = D.rows.map(r => ({ ...r,
+  chp: (r.px != null && r.ch != null && r.px - r.ch) ? r.ch / (r.px - r.ch) * 100 : null,
+  vol: r.vol != null ? Math.round(r.vol / 1000) : null }));
+const valid = rows.filter(r => r.pe > 0);
+$('date').textContent = '資料日期 ' + D.date + '　·　共 ' + rows.length + ' 檔（有本益比 ' + valid.length + ' 檔）';
+
+let sortK = 'pe', sortDir = 1;
+const fmt = (v, d = 2) => v == null ? '–' : v.toLocaleString('zh-TW', { minimumFractionDigits: d, maximumFractionDigits: d });
+const cls = v => v > 0 ? 'up' : v < 0 ? 'down' : '';
+const sign = v => v > 0 ? '▲' : v < 0 ? '▼' : '';
+
+// 跑馬燈：成交量前 30 大
+(function () {
+  const top = [...rows].filter(r => r.vol).sort((a, b) => b.vol - a.vol).slice(0, 30);
+  const html = top.map(r => `<b>${r.n}</b><span class="${cls(r.ch)}">${fmt(r.px)} ${sign(r.ch)}${fmt(Math.abs(r.ch ?? 0))}</span>`).join('');
+  $('ticker').innerHTML = html + html;
+})();
+
+function filtered() {
+  const pe = +$('pe').value, mkt = $('mkt').value, dy = +$('dy').value || 0;
+  const pb = $('pb').value === '' ? Infinity : +$('pb').value;
+  const q = $('q').value.trim().toLowerCase();
+  return valid.filter(r => r.pe < pe && (!mkt || r.m === mkt) && (r.dy ?? 0) >= dy && (r.pb ?? 0) <= pb &&
+    (!q || r.c.toLowerCase().includes(q) || r.n.toLowerCase().includes(q)));
+}
+
+function drawHist(pe) {
+  const bins = new Array(30).fill(0);
+  valid.forEach(r => bins[Math.min(29, Math.floor(r.pe / 2))]++);
+  const max = Math.max(...bins);
+  $('bars').innerHTML = bins.map((n, i) => {
+    const lo = i * 2, label = i === 29 ? '58+' : `${lo}–${lo + 2}`;
+    return `<div class="bar ${lo < pe ? 'on' : ''}" style="height:${Math.max(2, n / max * 100)}%" data-tip="本益比 ${label}：${n} 檔"></div>`;
+  }).join('');
+}
+
+function render() {
+  const pe = +$('pe').value;
+  $('peVal').textContent = pe;
+  drawHist(pe);
+  const list = filtered().sort((a, b) => {
+    const x = a[sortK], y = b[sortK];
+    if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === 'string' ? x.localeCompare(y) : x - y) * sortDir;
+  });
+  const avg = k => { const v = list.filter(r => r[k] != null); return v.length ? v.reduce((s, r) => s + r[k], 0) / v.length : null; };
+  $('sCount').textContent = list.length;
+  $('sPe').textContent = fmt(avg('pe'));
+  $('sDy').textContent = list.length ? fmt(avg('dy')) + '%' : '–';
+  $('sUd').innerHTML = `<span class="up">${list.filter(r => r.ch > 0).length}</span> / <span class="down">${list.filter(r => r.ch < 0).length}</span>`;
+  document.querySelectorAll('thead th').forEach(th => {
+    th.classList.toggle('sorted', th.dataset.k === sortK);
+    th.textContent = th.textContent.replace(/ [▲▼]$/, '') + (th.dataset.k === sortK ? (sortDir > 0 ? ' ▲' : ' ▼') : '');
+  });
+  if (!list.length) { $('tb').innerHTML = '<tr><td colspan="10" class="empty">沒有符合條件的股票</td></tr>'; return; }
+  $('tb').innerHTML = list.map(r => `<tr>
+    <td class="code">${r.c}</td><td class="name">${r.n}</td><td><span class="tag">${r.m}</span></td>
+    <td class="${cls(r.ch)}">${fmt(r.px)}</td>
+    <td class="${cls(r.ch)}">${sign(r.ch)} ${fmt(r.ch == null ? null : Math.abs(r.ch))}</td>
+    <td class="${cls(r.ch)}">${r.chp == null ? '–' : fmt(r.chp) + '%'}</td>
+    <td><div class="pecell"><div class="pebar"><i style="width:${Math.min(100, r.pe / pe * 100)}%"></i></div>${fmt(r.pe)}</div></td>
+    <td>${fmt(r.dy)}</td><td>${fmt(r.pb)}</td><td>${r.vol == null ? '–' : r.vol.toLocaleString()}</td>
+  </tr>`).join('');
+}
+
+document.querySelectorAll('thead th').forEach(th => th.onclick = () => {
+  if (sortK === th.dataset.k) sortDir = -sortDir; else { sortK = th.dataset.k; sortDir = 1; }
+  render();
+});
+['pe', 'mkt', 'dy', 'pb', 'q'].forEach(id => $(id).addEventListener('input', render));
+render();
+</script>
+</body>
+</html>
