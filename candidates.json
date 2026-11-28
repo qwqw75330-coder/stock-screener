@@ -15,8 +15,8 @@
                            "revenueMoMPct":  16.9,
                            "revenueYoYPct":  44.7,
                            "revenueYtdYoYPct":  68.8,
-                           "pe":  19.28,
-                           "pb":  5.37,
+                           "pe":  18,
+                           "pb":  5.02,
                            "marketCap100M":  745.5
                        },
                        {
@@ -48,24 +48,8 @@
                            "revenueYoYPct":  77.1,
                            "revenueYtdYoYPct":  57.7,
                            "pe":  15.18,
-                           "pb":  3.85,
+                           "pb":  3.86,
                            "marketCap100M":  734.8
-                       },
-                       {
-                           "code":  "4931",
-                           "name":  "新盛力",
-                           "market":  "上櫃",
-                           "industry":  "電腦及週邊設備業",
-                           "close":  137,
-                           "drawdownPct":  -49.7,
-                           "highDate":  "08/28",
-                           "vsMarketPct":  -34.5,
-                           "revenueMoMPct":  27.2,
-                           "revenueYoYPct":  106.7,
-                           "revenueYtdYoYPct":  97.9,
-                           "pe":  18.14,
-                           "pb":  5.2,
-                           "marketCap100M":  89.8
                        },
                        {
                            "code":  "6257",
@@ -84,6 +68,22 @@
                            "marketCap100M":  699.3
                        },
                        {
+                           "code":  "4931",
+                           "name":  "新盛力",
+                           "market":  "上櫃",
+                           "industry":  "電腦及週邊設備業",
+                           "close":  137,
+                           "drawdownPct":  -49.7,
+                           "highDate":  "08/28",
+                           "vsMarketPct":  -34.5,
+                           "revenueMoMPct":  27.2,
+                           "revenueYoYPct":  106.7,
+                           "revenueYtdYoYPct":  97.9,
+                           "pe":  17.56,
+                           "pb":  5.03,
+                           "marketCap100M":  89.8
+                       },
+                       {
                            "code":  "8096",
                            "name":  "擎亞",
                            "market":  "上櫃",
@@ -95,8 +95,8 @@
                            "revenueMoMPct":  12.8,
                            "revenueYoYPct":  370.3,
                            "revenueYtdYoYPct":  122.7,
-                           "pe":  6.68,
-                           "pb":  2.17,
+                           "pe":  6.5,
+                           "pb":  2.11,
                            "marketCap100M":  85.6
                        },
                        {
@@ -111,7 +111,7 @@
                            "revenueMoMPct":  11,
                            "revenueYoYPct":  -8.1,
                            "revenueYtdYoYPct":  4.4,
-                           "pe":  12.44,
+                           "pe":  12.43,
                            "pb":  1.99,
                            "marketCap100M":  128.8
                        },
@@ -175,8 +175,8 @@
                            "revenueMoMPct":  40.6,
                            "revenueYoYPct":  212.7,
                            "revenueYtdYoYPct":  177.2,
-                           "pe":  19.41,
-                           "pb":  3.2,
+                           "pe":  19.34,
+                           "pb":  3.19,
                            "marketCap100M":  86.4
                        },
                        {
@@ -191,8 +191,8 @@
                            "revenueMoMPct":  4.6,
                            "revenueYoYPct":  47.9,
                            "revenueYtdYoYPct":  36.8,
-                           "pe":  17.37,
-                           "pb":  3.14,
+                           "pe":  17.04,
+                           "pb":  3.08,
                            "marketCap100M":  750
                        },
                        {
@@ -223,8 +223,8 @@
                            "revenueMoMPct":  3.9,
                            "revenueYoYPct":  195.3,
                            "revenueYtdYoYPct":  50.5,
-                           "pe":  16.99,
-                           "pb":  3.23,
+                           "pe":  16.46,
+                           "pb":  3.13,
                            "marketCap100M":  55.8
                        },
                        {
@@ -271,8 +271,8 @@
                            "revenueMoMPct":  0.5,
                            "revenueYoYPct":  3.2,
                            "revenueYtdYoYPct":  28.5,
-                           "pe":  16.73,
-                           "pb":  1.98,
+                           "pe":  16.42,
+                           "pb":  1.95,
                            "marketCap100M":  168.8
                        },
                        {
@@ -287,8 +287,8 @@
                            "revenueMoMPct":  0.1,
                            "revenueYoYPct":  28.9,
                            "revenueYtdYoYPct":  34.3,
-                           "pe":  15.19,
-                           "pb":  2.63,
+                           "pe":  15.12,
+                           "pb":  2.62,
                            "marketCap100M":  131.3
                        },
                        {
@@ -319,7 +319,7 @@
                            "revenueMoMPct":  8.8,
                            "revenueYoYPct":  48.2,
                            "revenueYtdYoYPct":  32,
-                           "pe":  12.55,
+                           "pe":  12.56,
                            "pb":  1.66,
                            "marketCap100M":  309.1
                        },
@@ -351,8 +351,8 @@
                            "revenueMoMPct":  7.3,
                            "revenueYoYPct":  39.9,
                            "revenueYtdYoYPct":  16.3,
-                           "pe":  14.01,
-                           "pb":  1.43,
+                           "pe":  12.92,
+                           "pb":  1.32,
                            "marketCap100M":  54.6
                        },
                        {
@@ -368,7 +368,7 @@
                            "revenueYoYPct":  33.1,
                            "revenueYtdYoYPct":  17.8,
                            "pe":  8.3,
-                           "pb":  1.02,
+                           "pb":  1.03,
                            "marketCap100M":  162.1
                        },
                        {
@@ -415,7 +415,7 @@
                            "revenueMoMPct":  4.9,
                            "revenueYoYPct":  -10.8,
                            "revenueYtdYoYPct":  -11.3,
-                           "pe":  18.16,
+                           "pe":  18.14,
                            "pb":  0.93,
                            "marketCap100M":  118.2
                        },
@@ -480,7 +480,7 @@
                            "revenueYoYPct":  25.2,
                            "revenueYtdYoYPct":  29.8,
                            "pe":  17.36,
-                           "pb":  2.6,
+                           "pb":  2.61,
                            "marketCap100M":  1544.9
                        },
                        {
@@ -527,9 +527,25 @@
                            "revenueMoMPct":  8.5,
                            "revenueYoYPct":  282.3,
                            "revenueYtdYoYPct":  222.7,
-                           "pe":  2.41,
-                           "pb":  1.78,
+                           "pe":  2.53,
+                           "pb":  1.87,
                            "marketCap100M":  982.1
+                       },
+                       {
+                           "code":  "6664",
+                           "name":  "群翊",
+                           "market":  "上櫃",
+                           "industry":  "電子零組件業",
+                           "close":  257.5,
+                           "drawdownPct":  -33.4,
+                           "highDate":  "10/06",
+                           "vsMarketPct":  -12.3,
+                           "revenueMoMPct":  4,
+                           "revenueYoYPct":  26.4,
+                           "revenueYtdYoYPct":  20.1,
+                           "pe":  16.13,
+                           "pb":  3.53,
+                           "marketCap100M":  157.5
                        },
                        {
                            "code":  "4763",
@@ -575,8 +591,8 @@
                            "revenueMoMPct":  128.5,
                            "revenueYoYPct":  86.2,
                            "revenueYtdYoYPct":  -11,
-                           "pe":  14.44,
-                           "pb":  1.23,
+                           "pe":  14.06,
+                           "pb":  1.19,
                            "marketCap100M":  93.1
                        },
                        {
@@ -592,7 +608,7 @@
                            "revenueYoYPct":  71.9,
                            "revenueYtdYoYPct":  33,
                            "pe":  15.52,
-                           "pb":  4.76,
+                           "pb":  4.75,
                            "marketCap100M":  505.5
                        },
                        {
@@ -607,8 +623,8 @@
                            "revenueMoMPct":  1.2,
                            "revenueYoYPct":  38.5,
                            "revenueYtdYoYPct":  38.5,
-                           "pe":  7.77,
-                           "pb":  1.42,
+                           "pe":  7.76,
+                           "pb":  1.41,
                            "marketCap100M":  223.9
                        },
                        {
@@ -639,7 +655,7 @@
                            "revenueMoMPct":  26.3,
                            "revenueYoYPct":  62.7,
                            "revenueYtdYoYPct":  23.1,
-                           "pe":  3.83,
+                           "pe":  3.82,
                            "pb":  1.02,
                            "marketCap100M":  169.9
                        },
@@ -655,8 +671,8 @@
                            "revenueMoMPct":  2.9,
                            "revenueYoYPct":  346.3,
                            "revenueYtdYoYPct":  297.8,
-                           "pe":  4.71,
-                           "pb":  3.02,
+                           "pe":  4.56,
+                           "pb":  2.93,
                            "marketCap100M":  3498.7
                        },
                        {
@@ -688,7 +704,7 @@
                            "revenueYoYPct":  27.1,
                            "revenueYtdYoYPct":  18,
                            "pe":  17.56,
-                           "pb":  1.84,
+                           "pb":  1.83,
                            "marketCap100M":  79.4
                        },
                        {
@@ -719,8 +735,8 @@
                            "revenueMoMPct":  4.5,
                            "revenueYoYPct":  4,
                            "revenueYtdYoYPct":  13.1,
-                           "pe":  8.02,
-                           "pb":  1.14,
+                           "pe":  8.39,
+                           "pb":  1.19,
                            "marketCap100M":  112.7
                        }
                    ]
